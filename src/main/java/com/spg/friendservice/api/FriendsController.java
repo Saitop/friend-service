@@ -1,6 +1,7 @@
 package com.spg.friendservice.api;
 
 import com.spg.friendservice.dto.FriendConnectionDto;
+import com.spg.friendservice.dto.SuccessResponse;
 import com.spg.friendservice.service.FriendManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,13 +14,17 @@ import javax.validation.Valid;
 @RequestMapping(value = "/api/friends", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 public class FriendsController {
 
+    private final FriendManagementService friendManagementService;
+
     @Autowired
-    private FriendManagementService friendManagementService;
+    public FriendsController(FriendManagementService friendManagementService) {
+        this.friendManagementService = friendManagementService;
+    }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public FriendConnectionDto createFriendsConnection(@Valid @RequestBody FriendConnectionDto friendConnectionDto) {
+    public SuccessResponse createFriendsConnection(@Valid @RequestBody FriendConnectionDto friendConnectionDto) {
         friendManagementService.creatConnectionByEmails(friendConnectionDto);
-        return friendConnectionDto;
+        return SuccessResponse.builder().build();
     }
 }

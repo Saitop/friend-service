@@ -13,8 +13,12 @@ import java.util.stream.Collectors;
 @Service
 public class FriendManagementService {
 
+    private final UserDao userDao;
+
     @Autowired
-    private UserDao userDao;
+    public FriendManagementService(UserDao userDao) {
+        this.userDao = userDao;
+    }
 
     public List<User> creatConnectionByEmails(FriendConnectionDto friendConnectionDto) {
         final List<User> users = friendConnectionDto.getFriends().stream().map(email -> {
