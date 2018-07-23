@@ -1,24 +1,25 @@
 package com.spg.friendservice.api;
 
+import com.spg.friendservice.dto.FriendConnectionDto;
+import com.spg.friendservice.service.FriendManagementService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.Map;
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping(value = "/api/friends", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 public class FriendsController {
 
-    @GetMapping
-    @ResponseStatus(HttpStatus.OK)
-    public Map<String, String> findAllFriends() {
-        final HashMap<String, String> map = new HashMap<>();
-        map.put("key", "friends");
-        return map;
+    @Autowired
+    private FriendManagementService friendManagementService;
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public FriendConnectionDto createFriendsConnection(@Valid @RequestBody FriendConnectionDto friendConnectionDto) {
+        friendManagementService.creatConnectionByEmails(friendConnectionDto);
+        return friendConnectionDto;
     }
 }
