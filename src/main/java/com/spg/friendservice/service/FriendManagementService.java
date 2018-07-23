@@ -27,7 +27,6 @@ public class FriendManagementService {
         }).collect(Collectors.toList());
         //todo add friends
 //        users.stream().forEach(user -> {
-//
 //        });
         final List<User> newUsers = userDao.saveAll(users);
         return newUsers;

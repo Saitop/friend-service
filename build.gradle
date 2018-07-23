@@ -25,14 +25,16 @@ repositories {
 	mavenCentral()
 	maven { url "https://repo.spring.io/snapshot" }
 	maven { url "https://repo.spring.io/milestone" }
+	maven { url 'https://jitpack.io' }
 }
 
 ext {
 	springCloudVersion = 'Finchley.BUILD-SNAPSHOT'
+	junit5ApiVersion = '5.2.0'
+	junit5PlatformVersion = '1.2.0'
 }
 
 dependencies {
-	compile('org.springframework.boot:spring-boot-starter-data-jpa')
 	compile('org.springframework.boot:spring-boot-starter-data-mongodb')
 	compile('org.springframework.boot:spring-boot-starter-hateoas')
 	compile('org.springframework.boot:spring-boot-starter-web')
@@ -40,12 +42,25 @@ dependencies {
 	compile('org.springframework.cloud:spring-cloud-starter')
 	compile('org.flywaydb:flyway-core')
 	compileOnly('org.projectlombok:lombok')
-	testCompile('com.h2database:h2')
+	compile('com.alibaba:fastjson:1.2.47')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
+	testCompile("org.junit.jupiter:junit-jupiter-api:${junit5ApiVersion}")
+	testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junit5ApiVersion}")
+	testRuntimeOnly("org.junit.vintage:junit-vintage-engine:${junit5ApiVersion}")
+	testCompile("org.junit.jupiter:junit-jupiter-params:${junit5ApiVersion}")
+	testCompile("org.junit.platform:junit-platform-launcher:${junit5PlatformVersion}")
+	testCompile("org.junit.platform:junit-platform-runner:${junit5PlatformVersion}")
+	testCompile("com.github.sbrannen:spring-test-junit5:${junit5PlatformVersion}")
+	testCompile("de.flapdoodle.embed:de.flapdoodle.embed.mongo:2.0.1")
+	testCompile("cz.jirutka.spring:embedmongo-spring:1.3.1")
 }
 
 dependencyManagement {
 	imports {
 		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
 	}
+}
+
+test {
+	useJUnitPlatform()
 }
