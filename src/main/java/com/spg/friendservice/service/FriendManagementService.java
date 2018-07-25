@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -25,9 +26,16 @@ public class FriendManagementService {
             final Optional<User> userOptional = userDao.findByEmail(email);
             return userOptional.orElseGet(() -> User.builder().email(email).build());
         }).collect(Collectors.toList());
-        //todo add friends
-//        users.stream().forEach(user -> {
-//        });
+        users.stream().forEach(user -> {
+            final List<String> otherUserEmails = users.stream()
+                    .filter(u -> !u.getEmail().equals(user.getEmail())
+                            && !(Objects.nonNull(user.getFriends()) &&
+                            user.getFriends().contains(u.getEmail()))
+                    )
+                    .map(User::getEmail)
+                    .collect(Collectors.toList());
+            user.getFriends().addAll(otherUserEmails);
+        });
         final List<User> newUsers = userDao.saveAll(users);
         return newUsers;
     }
