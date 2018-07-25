@@ -1,4 +1,4 @@
-package com.spg.friendservice.dto;
+package com.spg.friendservice.dto.response;
 
 import lombok.*;
 

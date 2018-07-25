@@ -1,15 +1,16 @@
 package com.spg.friendservice.service;
 
 import com.spg.friendservice.dao.UserDao;
-import com.spg.friendservice.dto.FriendConnectionDto;
+import com.spg.friendservice.dto.request.FriendConnectionRequest;
+import com.spg.friendservice.dto.request.FriendListRequest;
 import com.spg.friendservice.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static java.util.Objects.nonNull;
 
 @Service
 public class FriendManagementService {
@@ -21,22 +22,30 @@ public class FriendManagementService {
         this.userDao = userDao;
     }
 
-    public List<User> creatConnectionByEmails(FriendConnectionDto friendConnectionDto) {
-        final List<User> users = friendConnectionDto.getFriends().stream().map(email -> {
+    public List<User> creatConnectionByEmails(FriendConnectionRequest friendConnectionRequest) {
+        final List<User> users = friendConnectionRequest.getFriends().stream().map(email -> {
             final Optional<User> userOptional = userDao.findByEmail(email);
             return userOptional.orElseGet(() -> User.builder().email(email).build());
         }).collect(Collectors.toList());
-        users.stream().forEach(user -> {
+        users.forEach(user -> {
             final List<String> otherUserEmails = users.stream()
                     .filter(u -> !u.getEmail().equals(user.getEmail())
-                            && !(Objects.nonNull(user.getFriends()) &&
+                            && !(nonNull(user.getFriends()) &&
                             user.getFriends().contains(u.getEmail()))
                     )
                     .map(User::getEmail)
                     .collect(Collectors.toList());
             user.getFriends().addAll(otherUserEmails);
         });
-        final List<User> newUsers = userDao.saveAll(users);
-        return newUsers;
+        return userDao.saveAll(users);
+    }
+
+    public List<String> getFriendsByEmail(FriendListRequest friendListRequest) {
+        Optional<User> user = userDao.findByEmail(friendListRequest.getEmail());
+        if(user.isPresent()) {
+            return user.get().getFriends();
+        } else {
+            return new ArrayList<>();
+        }
     }
 }

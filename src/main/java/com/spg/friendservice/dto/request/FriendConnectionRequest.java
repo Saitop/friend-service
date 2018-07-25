@@ -1,4 +1,4 @@
-package com.spg.friendservice.dto;
+package com.spg.friendservice.dto.request;
 
 import lombok.*;
 
@@ -9,6 +9,6 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class FriendConnectionDto {
+public class FriendConnectionRequest {
     private List<String> friends;
 }
