@@ -22,6 +22,7 @@ class FriendsControllerTest extends BaseControllerTestSetup  {
 
     public static final String JON_SNOW_GAME_COM = "jonSnow@game.com";
     public static final String YGITTE_GAME_COM = "ygritte@game.com";
+    public static final String SAMWELL_GAME_COM = "samwell@game.com";
 
     @Test
     void shouldReturnSuccessWhenCreateConnectionBetweenTowEmail() throws Exception {
@@ -60,5 +61,36 @@ class FriendsControllerTest extends BaseControllerTestSetup  {
                 .andExpect(jsonPath("$.success").value(Boolean.TRUE))
                 .andExpect(jsonPath("$.friends[0]").value(JON_SNOW_GAME_COM))
                 .andExpect(jsonPath("$.count").value(1));
+    }
+
+    @Test
+    void shouldReturnCommonFriendsBetweenTowEmail() throws Exception {
+        userDao.save(User.builder()
+                .email(YGITTE_GAME_COM)
+                .friends(Collections.singletonList(JON_SNOW_GAME_COM))
+                .build());
+
+        userDao.save(User.builder()
+                .email(SAMWELL_GAME_COM)
+                .friends(Collections.singletonList(JON_SNOW_GAME_COM))
+                .build());
+
+        userDao.save(User.builder()
+                .email(JON_SNOW_GAME_COM)
+                .friends(Arrays.asList(SAMWELL_GAME_COM, YGITTE_GAME_COM))
+                .build());
+
+        FriendConnectionRequest friendConnectionRequest = FriendConnectionRequest.builder()
+                .friends(Arrays.asList(SAMWELL_GAME_COM, YGITTE_GAME_COM))
+                .build();
+
+        mockMvc.perform(post("/api/friends/common")
+                .content(JSON.toJSONString(friendConnectionRequest))
+                .contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(Boolean.TRUE))
+                .andExpect(jsonPath("$.friends[0]").value(JON_SNOW_GAME_COM))
+                .andExpect(jsonPath("$.count").value(1));
+
     }
 }

@@ -43,4 +43,12 @@ public class FriendsController {
         final List<String> friends = friendManagementService.getFriendsByEmail(FriendListRequest);
         return FriendListResponse.builder().friends(friends).count(friends.size()).build();
     }
+
+    @PostMapping("/common")
+    @ResponseStatus(HttpStatus.OK)
+    public FriendListResponse getCommonFriends(@Valid @RequestBody FriendConnectionRequest friendConnectionRequest) {
+        List<String> friends = friendManagementService.getCommonFriends(friendConnectionRequest);
+        return FriendListResponse.builder().friends(friends).count(friends.size()).build();
+    }
+
 }

@@ -42,7 +42,13 @@ public class FriendManagementService {
     }
 
     public List<String> getFriendsByEmail(FriendListRequest friendListRequest) {
-        User user = userDao.findByEmail(friendListRequest.getEmail()).orElseThrow(UserNotFountException::new);
+        User user = userDao.findByEmail(friendListRequest.getEmail())
+                .orElseThrow(UserNotFountException::new);
         return user.getFriends();
+    }
+
+    public List<String> getCommonFriends(FriendConnectionRequest friendConnectionRequest) {
+        List<User> user = userDao.findAllByFriendsContains(friendConnectionRequest.getFriends());
+        return user.stream().map(User::getEmail).collect(Collectors.toList());
     }
 }
