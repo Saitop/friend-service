@@ -3,6 +3,7 @@ package com.spg.friendservice.service;
 import com.spg.friendservice.dao.UserDao;
 import com.spg.friendservice.dto.request.FriendConnectionRequest;
 import com.spg.friendservice.dto.request.FriendListRequest;
+import com.spg.friendservice.exception.UserNotFountException;
 import com.spg.friendservice.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,11 +42,7 @@ public class FriendManagementService {
     }
 
     public List<String> getFriendsByEmail(FriendListRequest friendListRequest) {
-        Optional<User> user = userDao.findByEmail(friendListRequest.getEmail());
-        if(user.isPresent()) {
-            return user.get().getFriends();
-        } else {
-            return new ArrayList<>();
-        }
+        User user = userDao.findByEmail(friendListRequest.getEmail()).orElseThrow(UserNotFountException::new);
+        return user.getFriends();
     }
 }
