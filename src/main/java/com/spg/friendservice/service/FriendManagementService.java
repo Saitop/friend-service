@@ -8,7 +8,9 @@ import com.spg.friendservice.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.nonNull;
@@ -48,7 +50,16 @@ public class FriendManagementService {
     }
 
     public List<String> getCommonFriends(FriendConnectionRequest friendConnectionRequest) {
-        List<User> user = userDao.findAllByFriendsContains(friendConnectionRequest.getFriends());
-        return user.stream().map(User::getEmail).collect(Collectors.toList());
+
+        final List<User> users = userDao.findAllByFriendsContains(friendConnectionRequest.getFriends());
+
+        final Map<String, List<String>> FriendMap = users.stream()
+                .collect(Collectors.toMap(User::getEmail, User::getFriends));
+
+        final List<User> commonFriends = users.stream().filter(user
+                -> FriendMap.get(user.getEmail()).containsAll(friendConnectionRequest.getFriends()))
+                .collect(Collectors.toList());
+
+        return commonFriends.stream().map(User::getEmail).collect(Collectors.toList());
     }
 }

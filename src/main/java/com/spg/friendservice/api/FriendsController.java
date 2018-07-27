@@ -4,6 +4,7 @@ import com.spg.friendservice.dto.request.FriendConnectionRequest;
 import com.spg.friendservice.dto.request.FriendListRequest;
 import com.spg.friendservice.dto.response.FriendListResponse;
 import com.spg.friendservice.dto.response.SuccessResponse;
+import com.spg.friendservice.model.User;
 import com.spg.friendservice.service.FriendManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

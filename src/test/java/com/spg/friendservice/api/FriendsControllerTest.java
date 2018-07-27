@@ -20,9 +20,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 class FriendsControllerTest extends BaseControllerTestSetup  {
 
-    public static final String JON_SNOW_GAME_COM = "jonSnow@game.com";
-    public static final String YGITTE_GAME_COM = "ygritte@game.com";
-    public static final String SAMWELL_GAME_COM = "samwell@game.com";
+    private static final String JON_SNOW_GAME_COM = "jonSnow@game.com";
+    private static final String YGITTE_GAME_COM = "ygritte@game.com";
+    private static final String SAMWELL_GAME_COM = "samwell@game.com";
 
     @Test
     void shouldReturnSuccessWhenCreateConnectionBetweenTowEmail() throws Exception {
