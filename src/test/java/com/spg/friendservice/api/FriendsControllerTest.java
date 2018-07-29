@@ -103,6 +103,42 @@ class FriendsControllerTest extends BaseControllerTestSetup  {
         assertEquals(ygritte.get().getSubscription().get(0), JON_SNOW_GAME_COM) ;
     }
 
+    @Test
+    void shouldReturnRequestorNotExistException() throws Exception {
+        saveUser(YGITTE_GAME_COM, Collections.singletonList(JON_SNOW_GAME_COM));
+        saveUser(JON_SNOW_GAME_COM, Arrays.asList(SAMWELL_GAME_COM, YGITTE_GAME_COM));
+        saveUser(YGITTE_GAME_COM, Collections.singletonList(JON_SNOW_GAME_COM));
+
+        SubscriptionRequest subscriptionRequest = SubscriptionRequest.builder()
+                .requestor(YGITTE_GAME_COM)
+                .target(JON_SNOW_GAME_COM)
+                .build();
+
+        mockMvc.perform(post("/api/friends/subscription")
+                .content(JSON.toJSONString(subscriptionRequest))
+                .contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(Boolean.FALSE))
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message").value("Target is not exist."));
+    }
+
+    @Test
+    void shouldReturnTargetNotExistException() throws Exception {
+        SubscriptionRequest subscriptionRequest = SubscriptionRequest.builder()
+                .requestor(YGITTE_GAME_COM)
+                .target(JON_SNOW_GAME_COM)
+                .build();
+
+        mockMvc.perform(post("/api/friends/subscription")
+                .content(JSON.toJSONString(subscriptionRequest))
+                .contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(Boolean.FALSE))
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message").value("Requestor is not exist."));
+    }
+    
     private User saveUser(String email, List<String> friends) {
         return userDao.save(User.builder()
                 .email(email)
