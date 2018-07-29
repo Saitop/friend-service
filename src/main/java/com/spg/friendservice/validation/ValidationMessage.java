@@ -9,6 +9,6 @@ public class ValidationMessage {
     public static final String USER_NOT_FOUNT = "User not fount.";
     public static final String REQUESTOR_NOT_EXIST = "Requestor is not exist.";
     public static final String TARGET_NOT_EXIST = "Target is not exist.";
-    public static final String DUPLICATE_SUBSCRIPTION = "Requestor (%s) has already subscribed to (%s) ";
+    public static final String DUPLICATE_SUBSCRIPTION = "Requestor(%s) had already subscribed to target (%s).";
 
 }
