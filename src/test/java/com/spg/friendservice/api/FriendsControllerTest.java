@@ -187,4 +187,26 @@ class FriendsControllerTest extends BaseControllerTestSetup  {
                         .value("Requestor(ygritte@game.com) had already subscribed to target (jonSnow@game.com).")
                 );
     }
+
+
+    @Test
+    void shouldReturnSelfSubscriptionExceptionIfSubscribeToOneself() throws Exception {
+        userBuilder.withDefault()
+                .withEmail(YGITTE_EMAIL)
+                .withFriends(Collections.singletonList(JON_SNOW_EMAIL))
+                .persist();
+
+        SubscriptionRequest subscriptionRequest = SubscriptionRequest.builder()
+                .requestor(YGITTE_EMAIL)
+                .target(YGITTE_EMAIL)
+                .build();
+
+        mockMvc.perform(post("/api/friends/subscription")
+                .content(JSON.toJSONString(subscriptionRequest))
+                .contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(Boolean.FALSE))
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message").value("Cannot subscribe to oneself."));
+    }
 }

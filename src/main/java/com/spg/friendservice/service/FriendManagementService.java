@@ -4,17 +4,13 @@ import com.spg.friendservice.dao.UserDao;
 import com.spg.friendservice.dto.request.FriendConnectionRequest;
 import com.spg.friendservice.dto.request.FriendListRequest;
 import com.spg.friendservice.dto.request.SubscriptionRequest;
-import com.spg.friendservice.exception.DuplicateSubscriptionException;
-import com.spg.friendservice.exception.RequestorNotExistException;
-import com.spg.friendservice.exception.TargetNotExistException;
-import com.spg.friendservice.exception.UserNotFountException;
+import com.spg.friendservice.exception.*;
 import com.spg.friendservice.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.nonNull;
@@ -72,7 +68,14 @@ public class FriendManagementService {
                 .orElseThrow(RequestorNotExistException::new);
         final User target = userDao.findByEmail(subscriptionRequest.getTarget())
                 .orElseThrow(TargetNotExistException::new);
-        if (!requestor.getSubscription().contains(target.getEmail())) {
+        if (subscriptionRequest.getTarget().equals(subscriptionRequest.getRequestor())) {
+            throw new SelfSubcriptionException();
+        }
+
+        if (CollectionUtils.isEmpty(requestor.getSubscription())) {
+           requestor.setSubscription(Collections.singletonList(subscriptionRequest.getTarget()));
+            userDao.save(requestor);
+        } else if (!requestor.getSubscription().contains(target.getEmail())) {
             requestor.getSubscription().add(subscriptionRequest.getTarget());
             userDao.save(requestor);
         } else {
