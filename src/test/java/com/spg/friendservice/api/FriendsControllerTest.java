@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.spg.friendservice.BaseControllerTestSetup;
 import com.spg.friendservice.dto.request.FriendConnectionRequest;
 import com.spg.friendservice.dto.request.FriendListRequest;
+import com.spg.friendservice.dto.request.SubscriptionRequest;
 import com.spg.friendservice.model.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
@@ -92,5 +93,34 @@ class FriendsControllerTest extends BaseControllerTestSetup  {
                 .andExpect(jsonPath("$.friends[0]").value(JON_SNOW_GAME_COM))
                 .andExpect(jsonPath("$.count").value(1));
 
+    }
+
+    @Test
+    void shouldSubscribeSuccessfullyWhenRequestorExist() throws Exception {
+        userDao.save(User.builder()
+                .email(YGITTE_GAME_COM)
+                .friends(Collections.singletonList(JON_SNOW_GAME_COM))
+                .build());
+
+        userDao.save(User.builder()
+                .email(JON_SNOW_GAME_COM)
+                .friends(Arrays.asList(SAMWELL_GAME_COM, YGITTE_GAME_COM))
+                .build());
+
+        SubscriptionRequest subscriptionRequest = SubscriptionRequest.builder()
+                .requestor(YGITTE_GAME_COM)
+                .target(JON_SNOW_GAME_COM)
+                .build();
+
+        mockMvc.perform(post("/api/friends/subscription")
+                .content(JSON.toJSONString(subscriptionRequest))
+                .contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(Boolean.TRUE));
+
+        Optional<User> ygritte = userDao.findByEmail(YGITTE_GAME_COM);
+        assertTrue(ygritte.isPresent());
+        assertEquals(ygritte.get().getSubscription().size(), 1) ;
+        assertEquals(ygritte.get().getSubscription().get(0), JON_SNOW_GAME_COM) ;
     }
 }

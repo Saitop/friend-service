@@ -2,6 +2,7 @@ package com.spg.friendservice.api;
 
 import com.spg.friendservice.dto.request.FriendConnectionRequest;
 import com.spg.friendservice.dto.request.FriendListRequest;
+import com.spg.friendservice.dto.request.SubscriptionRequest;
 import com.spg.friendservice.dto.response.FriendListResponse;
 import com.spg.friendservice.dto.response.SuccessResponse;
 import com.spg.friendservice.model.User;
@@ -34,8 +35,7 @@ public class FriendsController {
 
     /**
      * for a restful style api, should use http verb 'get' to query resource, like /api/friends?email=xxx@xx.com
-     * but the requirement is to accept a json, so I must use 'post' to accept query body,
-     * I don't know the intent of the requirement here.
+     * but the requirement is to accept a json, so I must use 'post' to accept query body.
      *
     **/
     @PostMapping("/list")
@@ -50,6 +50,13 @@ public class FriendsController {
     public FriendListResponse getCommonFriends(@Valid @RequestBody FriendConnectionRequest friendConnectionRequest) {
         List<String> friends = friendManagementService.getCommonFriends(friendConnectionRequest);
         return FriendListResponse.builder().friends(friends).count(friends.size()).build();
+    }
+
+    @PostMapping("/subscription")
+    @ResponseStatus(HttpStatus.OK)
+    public SuccessResponse subscribe(@Valid @RequestBody SubscriptionRequest subscriptionRequest) {
+        friendManagementService.createSubscription(subscriptionRequest);
+        return SuccessResponse.builder().build();
     }
 
 }
