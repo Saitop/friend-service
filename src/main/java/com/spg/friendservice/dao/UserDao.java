@@ -15,4 +15,6 @@ public interface UserDao extends MongoRepository<User, String> {
     List<User> findAllByFriendsContaining(String email);
 
     List<User> findAllBySubscriptionContaining(String email);
+
+    List<User> findAllByBlacklistContains(List<String> emails);
 }

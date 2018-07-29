@@ -35,18 +35,21 @@ public class FriendManagementService {
                 .filter(user -> !CollectionUtils.isEmpty(user.getBlacklist()))
                 .flatMap(user -> user.getBlacklist().stream())
                 .collect(Collectors.toList());
-        if(!CollectionUtils.isEmpty(blacklistEmails)) {
+        List<User> blacklistedUser = userDao.findAllByBlacklistContains(blacklistEmails);
+        blacklistEmails.addAll(blacklistedUser.stream().map(User::getEmail).collect(Collectors.toList()));
+        if(!CollectionUtils.isEmpty(blacklistEmails)
+                && blacklistEmails.containsAll(friendConnectionRequest.getFriends())) {
             throw new FriendsConnectionException();
         }
-        users.forEach(user -> {
+        users.forEach(currentUser -> {
             final List<String> otherUserEmails = users.stream()
-                    .filter(u -> !u.getEmail().equals(user.getEmail())
-                            && !(nonNull(user.getFriends()) &&
-                            user.getFriends().contains(u.getEmail()))
+                    .filter(u -> !u.getEmail().equals(currentUser.getEmail())
+                            && !(nonNull(currentUser.getFriends()) &&
+                            currentUser.getFriends().contains(u.getEmail()))
                     )
                     .map(User::getEmail)
                     .collect(Collectors.toList());
-            user.getFriends().addAll(otherUserEmails);
+            currentUser.getFriends().addAll(otherUserEmails);
         });
         return userDao.saveAll(users);
     }
