@@ -10,6 +10,8 @@ public class ValidationMessage {
     public static final String REQUESTOR_NOT_EXIST = "Requestor is not exist.";
     public static final String TARGET_NOT_EXIST = "Target is not exist.";
     public static final String DUPLICATE_SUBSCRIPTION = "Requestor(%s) had already subscribed to target (%s).";
-    public static final String CANNOT_SUBSCRIBE_TO_YOURSELF = "Cannot subscribe to oneself.";
+    public static final String DUPLICATE_BLACKLIST = "Requestor(%s) had already blacklisted target (%s).";
+    public static final String CANNOT_SUBSCRIBE_TO_ONESELF = "Cannot subscribe to oneself.";
+    public static final String CANNOT_BLACKLIST_ONESELF = "Cannot blacklist oneself.";
 
 }

@@ -188,7 +188,6 @@ class FriendsControllerTest extends BaseControllerTestSetup  {
                 );
     }
 
-
     @Test
     void shouldReturnSelfSubscriptionExceptionIfSubscribeToOneself() throws Exception {
         userBuilder.withDefault()
@@ -208,5 +207,82 @@ class FriendsControllerTest extends BaseControllerTestSetup  {
                 .andExpect(jsonPath("$.success").value(Boolean.FALSE))
                 .andExpect(jsonPath("$.status").value(400))
                 .andExpect(jsonPath("$.message").value("Cannot subscribe to oneself."));
+    }
+
+    @Test
+    void shouldReturnBlockSubscription() throws Exception {
+        userBuilder.withDefault()
+                .withEmail(YGITTE_EMAIL)
+                .withFriends(Collections.singletonList(JON_SNOW_EMAIL))
+                .persist();
+        userBuilder.withDefault()
+                .withEmail(JON_SNOW_EMAIL)
+                .withFriends(Arrays.asList(SAMWELL_EMAIL, YGITTE_EMAIL))
+                .persist();
+
+        SubscriptionRequest subscriptionRequest = SubscriptionRequest.builder()
+                .requestor(YGITTE_EMAIL)
+                .target(JON_SNOW_EMAIL)
+                .build();
+
+        mockMvc.perform(post("/api/friends/blacklist")
+                .content(JSON.toJSONString(subscriptionRequest))
+                .contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(Boolean.TRUE));
+
+        Optional<User> ygritte = userDao.findByEmail(YGITTE_EMAIL);
+        assertTrue(ygritte.isPresent());
+        assertEquals(ygritte.get().getBlacklist().size(), 1) ;
+        assertEquals(ygritte.get().getBlacklist().get(0), JON_SNOW_EMAIL) ;
+    }
+
+    @Test
+    void shouldReturnSelBlacklistExceptionIfBlacklistOneself() throws Exception {
+        userBuilder.withDefault()
+                .withEmail(YGITTE_EMAIL)
+                .withFriends(Collections.singletonList(JON_SNOW_EMAIL))
+                .persist();
+
+        SubscriptionRequest subscriptionRequest = SubscriptionRequest.builder()
+                .requestor(YGITTE_EMAIL)
+                .target(YGITTE_EMAIL)
+                .build();
+
+        mockMvc.perform(post("/api/friends/blacklist")
+                .content(JSON.toJSONString(subscriptionRequest))
+                .contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(Boolean.FALSE))
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message").value("Cannot blacklist oneself."));
+    }
+
+    @Test
+    void shouldReturnBlacklistExceptionWhenDoingDuplicateBlacklist() throws Exception {
+        userBuilder.withDefault()
+                .withEmail(YGITTE_EMAIL)
+                .withBlacklist(Collections.singletonList(JON_SNOW_EMAIL))
+                .persist();
+
+        userBuilder.withDefault()
+                .withEmail(JON_SNOW_EMAIL)
+                .withFriends(Arrays.asList(SAMWELL_EMAIL, YGITTE_EMAIL))
+                .persist();
+
+        SubscriptionRequest subscriptionRequest = SubscriptionRequest.builder()
+                .requestor(YGITTE_EMAIL)
+                .target(JON_SNOW_EMAIL)
+                .build();
+
+        mockMvc.perform(post("/api/friends/blacklist")
+                .content(JSON.toJSONString(subscriptionRequest))
+                .contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.success").value(Boolean.FALSE))
+                .andExpect(jsonPath("$.status").value(409))
+                .andExpect(jsonPath("$.message")
+                        .value("Requestor(ygritte@game.com) had already blacklisted target (jonSnow@game.com).")
+                );
     }
 }

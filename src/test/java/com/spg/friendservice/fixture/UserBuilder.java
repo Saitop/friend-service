@@ -21,6 +21,7 @@ public class UserBuilder {
                 .email("")
                 .friends(Collections.emptyList())
                 .subscription(Collections.emptyList())
+                .blacklist(Collections.emptyList())
                 .build();
         return this;
     }
@@ -37,6 +38,11 @@ public class UserBuilder {
 
     public UserBuilder withSubscription(List<String> subscription) {
         user.setSubscription(subscription);
+        return this;
+    }
+
+    public UserBuilder withBlacklist(List<String> blacklist) {
+        user.setBlacklist(blacklist);
         return this;
     }
 

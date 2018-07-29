@@ -69,7 +69,7 @@ public class FriendManagementService {
         final User target = userDao.findByEmail(subscriptionRequest.getTarget())
                 .orElseThrow(TargetNotExistException::new);
         if (subscriptionRequest.getTarget().equals(subscriptionRequest.getRequestor())) {
-            throw new SelfSubcriptionException();
+            throw new SelfSubscriptionException();
         }
 
         if (CollectionUtils.isEmpty(requestor.getSubscription())) {
@@ -78,8 +78,28 @@ public class FriendManagementService {
         } else if (!requestor.getSubscription().contains(target.getEmail())) {
             requestor.getSubscription().add(subscriptionRequest.getTarget());
             userDao.save(requestor);
-        } else {
+        } else if (requestor.getSubscription().contains(target.getEmail())){
             throw new DuplicateSubscriptionException(requestor.getEmail(), target.getEmail());
+        }
+    }
+
+    public void blacklist(SubscriptionRequest subscriptionRequest) {
+        final User requestor = userDao.findByEmail(subscriptionRequest.getRequestor())
+                .orElseThrow(RequestorNotExistException::new);
+        final User target = userDao.findByEmail(subscriptionRequest.getTarget())
+                .orElseThrow(TargetNotExistException::new);
+        if (subscriptionRequest.getTarget().equals(subscriptionRequest.getRequestor())) {
+            throw new SelfBlacklistException();
+        }
+
+        if (CollectionUtils.isEmpty(requestor.getBlacklist())) {
+            requestor.setBlacklist(Collections.singletonList(subscriptionRequest.getTarget()));
+            userDao.save(requestor);
+        } else if (!requestor.getBlacklist().contains(target.getEmail())) {
+            requestor.getBlacklist().add(subscriptionRequest.getTarget());
+            userDao.save(requestor);
+        } else if (requestor.getBlacklist().contains(target.getEmail())) {
+            throw new DuplicateBlacklistException(requestor.getEmail(), target.getEmail());
         }
     }
 }

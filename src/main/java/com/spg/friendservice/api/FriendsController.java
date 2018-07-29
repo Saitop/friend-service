@@ -5,7 +5,6 @@ import com.spg.friendservice.dto.request.FriendListRequest;
 import com.spg.friendservice.dto.request.SubscriptionRequest;
 import com.spg.friendservice.dto.response.FriendListResponse;
 import com.spg.friendservice.dto.response.SuccessResponse;
-import com.spg.friendservice.model.User;
 import com.spg.friendservice.service.FriendManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -56,6 +55,13 @@ public class FriendsController {
     @ResponseStatus(HttpStatus.OK)
     public SuccessResponse subscribe(@Valid @RequestBody SubscriptionRequest subscriptionRequest) {
         friendManagementService.createSubscription(subscriptionRequest);
+        return SuccessResponse.builder().build();
+    }
+
+    @PostMapping("/blacklist")
+    @ResponseStatus(HttpStatus.OK)
+    public SuccessResponse blacklist(@Valid @RequestBody SubscriptionRequest subscriptionRequest) {
+        friendManagementService.blacklist(subscriptionRequest);
         return SuccessResponse.builder().build();
     }
 

@@ -31,4 +31,7 @@ public class User {
     @Builder.Default
     private List<String> subscription = new ArrayList<>();
 
+    @Builder.Default
+    private List<String> blacklist = new ArrayList<>();
+
 }
