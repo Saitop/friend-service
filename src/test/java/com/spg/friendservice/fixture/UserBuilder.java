@@ -3,12 +3,14 @@ package com.spg.friendservice.fixture;
 import com.spg.friendservice.dao.UserDao;
 import com.spg.friendservice.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
 
 @Component
+@Profile("test")
 public class UserBuilder {
 
     private User user;

@@ -5,6 +5,7 @@ import com.spg.friendservice.BaseControllerTestSetup;
 import com.spg.friendservice.dto.request.FriendConnectionRequest;
 import com.spg.friendservice.dto.request.FriendListRequest;
 import com.spg.friendservice.dto.request.SubscriptionRequest;
+import com.spg.friendservice.dto.request.UpdateMessageRequest;
 import com.spg.friendservice.fixture.UserBuilder;
 import com.spg.friendservice.model.User;
 import org.junit.jupiter.api.Test;
@@ -326,6 +327,37 @@ class FriendsControllerTest extends BaseControllerTestSetup  {
                 .andExpect(jsonPath("$.message")
                         .value("Cannot add friends within blacklist.")
                 );
+    }
 
+    @Test
+    void shouldRetrieveRecipients() throws Exception {
+        userBuilder.withDefault()
+                .withEmail(YGITTE_EMAIL)
+                .withFriends(Collections.singletonList(JON_SNOW_EMAIL))
+                .persist();
+        userBuilder.withDefault()
+                .withEmail(JON_SNOW_EMAIL)
+                .withSubscription(Collections.singletonList(YGITTE_EMAIL))
+                .withFriends(Arrays.asList(SAMWELL_EMAIL, YGITTE_EMAIL))
+                .persist();
+
+        userBuilder.withDefault()
+                .withEmail(SAMWELL_EMAIL)
+                .withFriends(Collections.singletonList(JON_SNOW_EMAIL))
+                .persist();
+
+        UpdateMessageRequest updateMessageRequest = UpdateMessageRequest.builder()
+                .sender(YGITTE_EMAIL)
+                .text(String.format("Hello %s, I am jon's best friend", SAMWELL_EMAIL))
+                .build();
+
+        mockMvc.perform(post("/api/friends/updates")
+                .content(JSON.toJSONString(updateMessageRequest))
+                .contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(Boolean.TRUE))
+                .andExpect(jsonPath("$.count").value(2))
+                .andExpect(jsonPath("$.recipients[0]").value(JON_SNOW_EMAIL))
+                .andExpect(jsonPath("$.recipients[1]").value(SAMWELL_EMAIL));
     }
 }

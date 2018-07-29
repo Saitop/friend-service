@@ -7,11 +7,13 @@ import com.spg.friendservice.dto.request.SubscriptionRequest;
 import com.spg.friendservice.dto.request.UpdateMessageRequest;
 import com.spg.friendservice.exception.*;
 import com.spg.friendservice.model.User;
+import com.spg.friendservice.validation.EmailHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
+import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.nonNull;
@@ -20,10 +22,12 @@ import static java.util.Objects.nonNull;
 public class FriendManagementService {
 
     private final UserDao userDao;
+    private final EmailHandler emailHandler;
 
     @Autowired
-    public FriendManagementService(UserDao userDao) {
+    public FriendManagementService(UserDao userDao, EmailHandler emailHandler) {
         this.userDao = userDao;
+        this.emailHandler = emailHandler;
     }
 
     public List<User> creatConnectionByEmails(FriendConnectionRequest friendConnectionRequest) {
@@ -122,9 +126,18 @@ public class FriendManagementService {
         List<User> recipients = new ArrayList<>();
         final List<User> friends = userDao.findAllByFriendsContaining(updateMessageRequest.getSender());
         final List<User> subscribers = userDao.findAllBySubscriptionContaining(updateMessageRequest.getSender());
-
         recipients.addAll(friends);
         recipients.addAll(subscribers);
-        return recipients.stream().map(User::getEmail).collect(Collectors.toList());
+
+        Matcher emailMatcher = emailHandler.matcher(updateMessageRequest.getText());
+        List<String> emails = new ArrayList<>();
+        while (emailMatcher.find()) {
+            String emailInText = emailMatcher.group();
+            emails.add(emailInText);
+        }
+        List<User> mentionedUsers = userDao.findAllByEmailIn(emails);
+        recipients.addAll(mentionedUsers);
+
+        return recipients.stream().map(User::getEmail).distinct().collect(Collectors.toList());
     }
 }
