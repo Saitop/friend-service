@@ -210,10 +210,11 @@ class FriendsControllerTest extends BaseControllerTestSetup  {
     }
 
     @Test
-    void shouldReturnBlockSubscription() throws Exception {
+    void shouldBlacklist() throws Exception {
         userBuilder.withDefault()
                 .withEmail(YGITTE_EMAIL)
                 .withFriends(Collections.singletonList(JON_SNOW_EMAIL))
+                .withSubscription(Collections.singletonList(JON_SNOW_EMAIL))
                 .persist();
         userBuilder.withDefault()
                 .withEmail(JON_SNOW_EMAIL)
@@ -235,6 +236,8 @@ class FriendsControllerTest extends BaseControllerTestSetup  {
         assertTrue(ygritte.isPresent());
         assertEquals(ygritte.get().getBlacklist().size(), 1) ;
         assertEquals(ygritte.get().getBlacklist().get(0), JON_SNOW_EMAIL) ;
+        assertEquals(ygritte.get().getSubscription().size(), 0) ;
+        assertEquals(ygritte.get().getFriends().size(), 0) ;
     }
 
     @Test

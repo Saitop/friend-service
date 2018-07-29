@@ -74,13 +74,12 @@ public class FriendManagementService {
 
         if (CollectionUtils.isEmpty(requestor.getSubscription())) {
            requestor.setSubscription(Collections.singletonList(subscriptionRequest.getTarget()));
-            userDao.save(requestor);
         } else if (!requestor.getSubscription().contains(target.getEmail())) {
             requestor.getSubscription().add(subscriptionRequest.getTarget());
-            userDao.save(requestor);
         } else if (requestor.getSubscription().contains(target.getEmail())){
             throw new DuplicateSubscriptionException(requestor.getEmail(), target.getEmail());
         }
+        userDao.save(requestor);
     }
 
     public void blacklist(SubscriptionRequest subscriptionRequest) {
@@ -94,12 +93,21 @@ public class FriendManagementService {
 
         if (CollectionUtils.isEmpty(requestor.getBlacklist())) {
             requestor.setBlacklist(Collections.singletonList(subscriptionRequest.getTarget()));
-            userDao.save(requestor);
         } else if (!requestor.getBlacklist().contains(target.getEmail())) {
             requestor.getBlacklist().add(subscriptionRequest.getTarget());
-            userDao.save(requestor);
         } else if (requestor.getBlacklist().contains(target.getEmail())) {
             throw new DuplicateBlacklistException(requestor.getEmail(), target.getEmail());
         }
+        if(!CollectionUtils.isEmpty(requestor.getSubscription())) {
+            requestor.getSubscription().remove(subscriptionRequest.getTarget());
+        }
+        if(!CollectionUtils.isEmpty(requestor.getFriends())) {
+            requestor.getFriends().remove(subscriptionRequest.getTarget());
+        }
+        if(!CollectionUtils.isEmpty(target.getFriends())) {
+            target.getFriends().remove(subscriptionRequest.getRequestor());
+        }
+        userDao.save(requestor);
+        userDao.save(target);
     }
 }
