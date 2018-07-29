@@ -30,6 +30,13 @@ public class FriendManagementService {
             final Optional<User> userOptional = userDao.findByEmail(email);
             return userOptional.orElseGet(() -> User.builder().email(email).build());
         }).collect(Collectors.toList());
+        final List<String> blacklistEmails = users.stream()
+                .filter(user -> !CollectionUtils.isEmpty(user.getBlacklist()))
+                .flatMap(user -> user.getBlacklist().stream())
+                .collect(Collectors.toList());
+        if(!CollectionUtils.isEmpty(blacklistEmails)) {
+            throw new FriendsConnectionException();
+        }
         users.forEach(user -> {
             final List<String> otherUserEmails = users.stream()
                     .filter(u -> !u.getEmail().equals(user.getEmail())
@@ -40,6 +47,8 @@ public class FriendManagementService {
                     .collect(Collectors.toList());
             user.getFriends().addAll(otherUserEmails);
         });
+
+
         return userDao.saveAll(users);
     }
 
