@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -45,11 +46,7 @@ class FriendsControllerTest extends BaseControllerTestSetup  {
 
     @Test
     void shouldReturnFriendsByEmail() throws Exception {
-        userDao.save(User.builder()
-                .email(YGITTE_GAME_COM)
-                .friends(Collections.singletonList(JON_SNOW_GAME_COM))
-                .build());
-
+        final User ygritt = saveUser(YGITTE_GAME_COM, Collections.singletonList(JON_SNOW_GAME_COM));
 
         FriendListRequest friendListRequest = FriendListRequest.builder()
                 .email(YGITTE_GAME_COM)
@@ -60,26 +57,15 @@ class FriendsControllerTest extends BaseControllerTestSetup  {
                 .contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(Boolean.TRUE))
-                .andExpect(jsonPath("$.friends[0]").value(JON_SNOW_GAME_COM))
+                .andExpect(jsonPath("$.friends[0]").value(ygritt.getFriends().get(0)))
                 .andExpect(jsonPath("$.count").value(1));
     }
 
     @Test
     void shouldReturnCommonFriendsBetweenTowEmail() throws Exception {
-        userDao.save(User.builder()
-                .email(YGITTE_GAME_COM)
-                .friends(Collections.singletonList(JON_SNOW_GAME_COM))
-                .build());
-
-        userDao.save(User.builder()
-                .email(SAMWELL_GAME_COM)
-                .friends(Collections.singletonList(JON_SNOW_GAME_COM))
-                .build());
-
-        userDao.save(User.builder()
-                .email(JON_SNOW_GAME_COM)
-                .friends(Arrays.asList(SAMWELL_GAME_COM, YGITTE_GAME_COM))
-                .build());
+        saveUser(YGITTE_GAME_COM, Collections.singletonList(JON_SNOW_GAME_COM));
+        saveUser(SAMWELL_GAME_COM, Collections.singletonList(JON_SNOW_GAME_COM));
+        saveUser(JON_SNOW_GAME_COM, Arrays.asList(SAMWELL_GAME_COM, YGITTE_GAME_COM));
 
         FriendConnectionRequest friendConnectionRequest = FriendConnectionRequest.builder()
                 .friends(Arrays.asList(SAMWELL_GAME_COM, YGITTE_GAME_COM))
@@ -97,15 +83,8 @@ class FriendsControllerTest extends BaseControllerTestSetup  {
 
     @Test
     void shouldSubscribeSuccessfullyWhenRequestorExist() throws Exception {
-        userDao.save(User.builder()
-                .email(YGITTE_GAME_COM)
-                .friends(Collections.singletonList(JON_SNOW_GAME_COM))
-                .build());
-
-        userDao.save(User.builder()
-                .email(JON_SNOW_GAME_COM)
-                .friends(Arrays.asList(SAMWELL_GAME_COM, YGITTE_GAME_COM))
-                .build());
+        saveUser(YGITTE_GAME_COM, Collections.singletonList(JON_SNOW_GAME_COM));
+        saveUser(JON_SNOW_GAME_COM, Arrays.asList(SAMWELL_GAME_COM, YGITTE_GAME_COM));
 
         SubscriptionRequest subscriptionRequest = SubscriptionRequest.builder()
                 .requestor(YGITTE_GAME_COM)
@@ -122,5 +101,12 @@ class FriendsControllerTest extends BaseControllerTestSetup  {
         assertTrue(ygritte.isPresent());
         assertEquals(ygritte.get().getSubscription().size(), 1) ;
         assertEquals(ygritte.get().getSubscription().get(0), JON_SNOW_GAME_COM) ;
+    }
+
+    private User saveUser(String email, List<String> friends) {
+        return userDao.save(User.builder()
+                .email(email)
+                .friends(friends)
+                .build());
     }
 }
