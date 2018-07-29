@@ -3,7 +3,9 @@ package com.spg.friendservice.api;
 import com.spg.friendservice.dto.request.FriendConnectionRequest;
 import com.spg.friendservice.dto.request.FriendListRequest;
 import com.spg.friendservice.dto.request.SubscriptionRequest;
+import com.spg.friendservice.dto.request.UpdateMessageRequest;
 import com.spg.friendservice.dto.response.FriendListResponse;
+import com.spg.friendservice.dto.response.RecipientListResponse;
 import com.spg.friendservice.dto.response.SuccessResponse;
 import com.spg.friendservice.service.FriendManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,4 +67,10 @@ public class FriendsController {
         return SuccessResponse.builder().build();
     }
 
+    @PostMapping("/updates")
+    @ResponseStatus(HttpStatus.OK)
+    public RecipientListResponse updates(@Valid @RequestBody UpdateMessageRequest updateMessageRequest) {
+        final List<String> recipients = friendManagementService.getRecipients(updateMessageRequest);
+        return RecipientListResponse.builder().recipients(recipients).count(recipients.size()).build();
+    }
 }

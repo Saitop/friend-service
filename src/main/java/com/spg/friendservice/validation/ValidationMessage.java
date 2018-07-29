@@ -14,5 +14,6 @@ public class ValidationMessage {
     public static final String CANNOT_SUBSCRIBE_TO_ONESELF = "Cannot subscribe to oneself.";
     public static final String CANNOT_BLACKLIST_ONESELF = "Cannot blacklist oneself.";
     public static final String CANNOT_ADD_FRIENDS_WITHIN_BLACKLIST = "Cannot add friends within blacklist.";
+    public static final String SENDER_CONNOT_BE_NULL = "Sender cannot be null..";
 
 }

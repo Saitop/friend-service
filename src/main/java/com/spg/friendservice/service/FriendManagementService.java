@@ -4,6 +4,7 @@ import com.spg.friendservice.dao.UserDao;
 import com.spg.friendservice.dto.request.FriendConnectionRequest;
 import com.spg.friendservice.dto.request.FriendListRequest;
 import com.spg.friendservice.dto.request.SubscriptionRequest;
+import com.spg.friendservice.dto.request.UpdateMessageRequest;
 import com.spg.friendservice.exception.*;
 import com.spg.friendservice.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,8 +48,6 @@ public class FriendManagementService {
                     .collect(Collectors.toList());
             user.getFriends().addAll(otherUserEmails);
         });
-
-
         return userDao.saveAll(users);
     }
 
@@ -59,16 +58,12 @@ public class FriendManagementService {
     }
 
     public List<String> getCommonFriends(FriendConnectionRequest friendConnectionRequest) {
-
         final List<User> users = userDao.findAllByFriendsContains(friendConnectionRequest.getFriends());
-
         final Map<String, List<String>> FriendMap = users.stream()
                 .collect(Collectors.toMap(User::getEmail, User::getFriends));
-
         final List<User> commonFriends = users.stream().filter(user
                 -> FriendMap.get(user.getEmail()).containsAll(friendConnectionRequest.getFriends()))
                 .collect(Collectors.toList());
-
         return commonFriends.stream().map(User::getEmail).collect(Collectors.toList());
     }
 
@@ -118,5 +113,15 @@ public class FriendManagementService {
         }
         userDao.save(requestor);
         userDao.save(target);
+    }
+
+    public List<String> getRecipients(UpdateMessageRequest updateMessageRequest) {
+        List<User> recipients = new ArrayList<>();
+        final List<User> friends = userDao.findAllByFriendsContaining(updateMessageRequest.getSender());
+        final List<User> subscribers = userDao.findAllBySubscriptionContaining(updateMessageRequest.getSender());
+
+        recipients.addAll(friends);
+        recipients.addAll(subscribers);
+        return recipients.stream().map(User::getEmail).collect(Collectors.toList());
     }
 }

@@ -10,12 +10,11 @@ import javax.validation.constraints.NotNull;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class SubscriptionRequest {
+public class UpdateMessageRequest {
 
-    @NotNull(message = ValidationMessage.REQUESTOR_EMAIL_CANNOT_BE_NULL)
-    private String requestor;
+    @NotNull(message = ValidationMessage.SENDER_CONNOT_BE_NULL)
+    private String sender;
 
-    @NotNull(message = ValidationMessage.TARGET_EMAIL_CANNOT_BE_NULL)
-    private String target;
+    private String text;
 
 }
