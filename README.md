@@ -3,9 +3,19 @@
 ### Version Required:
 
 * Java: 8
+* Docker version 18.06.0-ce, build 0ffa825
 
 -------------------------------------
 
+### one command to run project
+```
+
+```
+
+
+
+
+--------------------------------------
 ### Build Step:
 
 ```

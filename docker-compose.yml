@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+  mongodb:
+    image: mongo
+    container_name: "mongodb"
+    environment:
+      - MONGO_DATA_DIR=/data/db
+      - MONGO_LOG_DIR=/dev/null
+    ports:
+      - "27018:27017"
+    command: mongod --smallfiles --logpath=/dev/null # --quiet
+  friend_service:
+    build: .
+    container_name: "friend-service"
+    environment:
+        - SPRING_PROFILES_ACTIVE=dev
+        - MONGO_URL=mongodb://mongodb/spg_friends
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongodb
