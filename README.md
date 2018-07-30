@@ -4,6 +4,7 @@
 
 * Java: 8
 * Docker version 18.06.0-ce, build 0ffa825
+* docker-compose version 1.22.0, build f46880f
 
 -------------------------------------
 
