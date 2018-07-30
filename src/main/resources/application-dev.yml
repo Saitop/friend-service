@@ -3,7 +3,7 @@ spring:
     enabled: false
   data:
     mongodb:
-      uri: ${MONGO_URL:mongodb://docker.for.mac.localhost:27018/spg_friends}
+      uri: ${MONGO_URL:mongodb://docker.for.mac.localhost:27017/spg_friends}
   jpa:
     hibernate:
       use-new-id-generator-mappings: true

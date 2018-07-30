@@ -10,8 +10,9 @@ services:
     ports:
       - "27018:27017"
     command: mongod --smallfiles --logpath=/dev/null # --quiet
-  friend_service:
+  friend-service:
     build: .
+    image: friend-services:latest
     container_name: "friend-service"
     environment:
         - SPRING_PROFILES_ACTIVE=dev
