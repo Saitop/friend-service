@@ -8,11 +8,17 @@
 -------------------------------------
 
 ### one command to run project
-```
+
+###### If it's first-time running, it would take a while to download images like mongo
 
 ```
+./run.sh
+```
 
-
+to stop the services:
+```
+./stop.sh
+```
 
 
 --------------------------------------
